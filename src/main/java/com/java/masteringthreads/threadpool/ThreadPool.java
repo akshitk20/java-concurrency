@@ -1,4 +1,4 @@
-package com.java.masteringthreads.threadpoolsynchronization;
+package com.java.masteringthreads.threadpool;
 
 public interface ThreadPool {
     /*

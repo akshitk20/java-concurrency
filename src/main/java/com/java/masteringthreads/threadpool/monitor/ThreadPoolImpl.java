@@ -1,17 +1,23 @@
-package com.java.masteringthreads.threadpoolsynchronization;
+package com.java.masteringthreads.threadpool.monitor;
+
+import com.java.masteringthreads.threadpool.ThreadPool;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /*
- * implementing Threadpool using synchronization method
- * in the queue we will add in the last and remove from front
- */
+* implement Threadpool using monitor locks (Reentrant lock)
+* in the queue we will add in the last and remove from front
+*
+* */
 public class ThreadPoolImpl implements ThreadPool {
-
     private final Deque<Runnable> queue = new ArrayDeque<>();
-
+    private final Lock lock = new ReentrantLock();
+    private final Condition notEmpty = lock.newCondition();
     private final Runnable POISON_PILL = () -> {};
 
     public ThreadPoolImpl(int size) {
@@ -21,43 +27,56 @@ public class ThreadPoolImpl implements ThreadPool {
         }
     }
 
-    private Runnable take() throws InterruptedException {
-        synchronized (queue) {
-            while (queue.isEmpty()) queue.wait();
+    private Runnable take() {
+        lock.lock();
+        try {
+            while (queue.isEmpty()) notEmpty.awaitUninterruptibly();
             var task = queue.removeFirst();
             if (task == POISON_PILL) {
                 queue.addLast(task);
-                queue.notifyAll();
+                notEmpty.signal();
             }
             return task;
+        } finally {
+            lock.unlock();
         }
     }
+
     @Override
     public void submit(Runnable task) {
-        synchronized (queue) {
+        lock.lock();
+        try {
             if (queue.peekLast() == POISON_PILL) {
                 throw new RejectedExecutionException("shutdown");
             }
             queue.addLast(task);
-            queue.notifyAll();
+            notEmpty.signal();
+        } finally {
+            lock.unlock();
         }
     }
 
     @Override
     public int getRunQueueLength() {
-        synchronized (queue) {
+        lock.lock();
+        try {
             return (int) queue.stream()
                     .filter(task -> task != POISON_PILL)
                     .count();
+        } finally {
+            lock.unlock();
         }
     }
 
     @Override
     public void shutdown() {
-        synchronized (queue) {
+        lock.lock();
+        try {
             if (queue.peekLast() != POISON_PILL) {
                 submit(POISON_PILL);
             }
+        } finally {
+            lock.unlock();
         }
     }
 
@@ -69,23 +88,19 @@ public class ThreadPoolImpl implements ThreadPool {
         @Override
         public void run() {
             while (true) {
-                try {
-                    var task = take();
-                    if (task == POISON_PILL) {
-                        System.out.println("Found a poison pill");
-                        break;
-                    }
-                    task.run();
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
+                var task = take();
+                if (task == POISON_PILL) {
+                    System.out.println("Found a poison pill");
+                    break;
                 }
+                task.run();
             }
             System.out.println("Completed thread " + getName());
         }
     }
 
     public static void main(String[] args) {
-        ThreadPool threadPool = new ThreadPoolImpl(5);
+        ThreadPool threadPool = new com.java.masteringthreads.threadpool.synchronization.ThreadPoolImpl(5);
         threadPool.submit(() -> System.out.println("Task1"));
         threadPool.submit(() -> System.out.println("Task2"));
         threadPool.submit(() -> System.out.println("Task3"));
@@ -93,5 +108,4 @@ public class ThreadPoolImpl implements ThreadPool {
         threadPool.submit(() -> System.out.println("Task5"));
         threadPool.shutdown();
     }
-
 }
