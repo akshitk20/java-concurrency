@@ -1,8 +1,5 @@
 package com.java.masteringthreads.threadpoolsynchronization;
 
-/*
-* implementing Threadpool using synchronization method
-* */
 public interface ThreadPool {
     /*
     * submit a task to the thread pool where it will be placed in the queue and picked by
