@@ -11,7 +11,8 @@ public class SingletonDemo {
                 .parallel()
                 //.forEach(i -> SingletonClassic.getSingletonClassic());
                 //.forEach(i -> SingletonSynchronized.getSingletonSynchronized());
-                .forEach(i -> SingletonDCL.getSingletonDCL());
+                //.forEach(i -> SingletonDCL.getSingletonDCL());
+                .forEach(i -> SingletonLoader.getSingletonLoader());
         Instant end = Instant.now();
         System.out.println("Total time taken : " + Duration.between(start, end).toMillis() + " ms");
 
