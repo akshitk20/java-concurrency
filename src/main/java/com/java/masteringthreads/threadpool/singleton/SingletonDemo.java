@@ -10,7 +10,8 @@ public class SingletonDemo {
         IntStream.range(0,10_000_000)
                 .parallel()
                 //.forEach(i -> SingletonClassic.getSingletonClassic());
-                .forEach(i -> SingletonSynchronized.getSingletonSynchronized());
+                //.forEach(i -> SingletonSynchronized.getSingletonSynchronized());
+                .forEach(i -> SingletonDCL.getSingletonDCL());
         Instant end = Instant.now();
         System.out.println("Total time taken : " + Duration.between(start, end).toMillis() + " ms");
 
