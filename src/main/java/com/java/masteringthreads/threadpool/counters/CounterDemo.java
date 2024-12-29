@@ -2,6 +2,8 @@ package com.java.masteringthreads.threadpool.counters;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.IntStream;
 
 public class CounterDemo {
@@ -24,9 +26,40 @@ public class CounterDemo {
         }
     }
 
+    static class ReentrantLockCounter implements Counter {
+        private final Lock lock;
+        private long value;
+
+        public ReentrantLockCounter(boolean fair) {
+            lock = new ReentrantLock(fair);
+        }
+
+        @Override
+        public void increment() {
+            lock.lock();
+            try {
+                value++;
+            } finally {
+                lock.unlock();
+            }
+        }
+
+        @Override
+        public long get() {
+            lock.lock();
+            try {
+                return value;
+            } finally {
+                lock.unlock();
+            }
+        }
+    }
+
     public static void main(String[] args) {
         for (int i = 0 ; i < 1 ; i++) {
             test(new SynchronizedCounter());
+            test(new ReentrantLockCounter(false));
+            test(new ReentrantLockCounter(true));
         }
     }
 
