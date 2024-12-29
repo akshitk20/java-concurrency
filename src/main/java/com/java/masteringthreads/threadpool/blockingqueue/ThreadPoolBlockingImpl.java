@@ -96,4 +96,17 @@ public class ThreadPoolBlockingImpl implements ThreadPoolBlocking {
             System.out.println("Completed Thread " + getName());
         }
     }
+
+    public static void main(String[] args) throws InterruptedException {
+        ThreadPoolBlocking threadPool = new ThreadPoolBlockingImpl(5);
+        threadPool.submit(() -> System.out.println("Task1"));
+        threadPool.submit(() -> System.out.println("Task2"));
+        threadPool.submit(() -> System.out.println("Task3"));
+//        List<Runnable> runnables = threadPool.shutDownNow();
+//        runnables.forEach(System.out::println);
+        threadPool.submit(() -> System.out.println("Task4"));
+        threadPool.submit(() -> System.out.println("Task5"));
+        threadPool.awaitTermination(4, TimeUnit.MILLISECONDS);
+        threadPool.shutdown();
+    }
 }
