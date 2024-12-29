@@ -5,7 +5,7 @@ public class HouseDrawing extends StupidFramework {
     private static final ThreadLocal<String> tempColor = new ThreadLocal<>();
 
     public HouseDrawing(String title, String color) {
-        super(saveColor(title, color));
+        super(saveColor(title, color)); // assigning color in temp variable so we can set it before call to draw is made
         this.color = color;
         tempColor.remove();
     }
