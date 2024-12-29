@@ -25,7 +25,6 @@ public class CounterDemo {
             return value;
         }
     }
-
     static class ReentrantLockCounter implements Counter {
         private final Lock lock;
         private long value;
@@ -54,12 +53,25 @@ public class CounterDemo {
             }
         }
     }
+    static class SynchronizedVolatileCounter implements Counter {
+        private volatile long value;
+        @Override
+        public synchronized void increment() {
+            value++;
+        }
+
+        @Override
+        public long get() {
+            return value;
+        }
+    }
 
     public static void main(String[] args) {
         for (int i = 0 ; i < 1 ; i++) {
             test(new SynchronizedCounter());
             test(new ReentrantLockCounter(false));
             test(new ReentrantLockCounter(true));
+            test(new SynchronizedVolatileCounter());
         }
     }
 
