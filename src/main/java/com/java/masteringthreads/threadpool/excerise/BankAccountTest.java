@@ -2,7 +2,6 @@ package com.java.masteringthreads.threadpool.excerise;
 
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.Executor;
 
 /*
 * Create a bank account with balance 1000
