@@ -2,6 +2,7 @@ package com.java.masteringthreads.threadpool.counters;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.IntStream;
@@ -65,6 +66,18 @@ public class CounterDemo {
             return value;
         }
     }
+    static class AtomicCounter implements Counter {
+        private final AtomicLong atomicLong = new AtomicLong();
+        @Override
+        public void increment() {
+            atomicLong.getAndIncrement();
+        }
+
+        @Override
+        public long get() {
+            return atomicLong.get();
+        }
+    }
 
     public static void main(String[] args) {
         for (int i = 0 ; i < 1 ; i++) {
@@ -72,6 +85,7 @@ public class CounterDemo {
             test(new ReentrantLockCounter(false));
             test(new ReentrantLockCounter(true));
             test(new SynchronizedVolatileCounter());
+            test(new AtomicCounter());
         }
     }
 
