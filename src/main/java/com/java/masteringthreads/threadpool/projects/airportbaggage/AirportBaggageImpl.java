@@ -5,9 +5,9 @@ import java.util.Deque;
 import java.util.concurrent.RejectedExecutionException;
 
 public class AirportBaggageImpl implements AirportBaggage {
-    private final Deque<Runnable> queue;
+    private final Deque<Baggage> queue;
 
-    private final Runnable POISON_PILL = () -> {};
+    private final Baggage POISON_PILL = new Baggage(0, "");
 
     public AirportBaggageImpl(int size) {
         if (size < 1) {
@@ -19,24 +19,26 @@ public class AirportBaggageImpl implements AirportBaggage {
         }
     }
 
-    private Runnable take() throws InterruptedException {
+    private Baggage take() throws InterruptedException {
         synchronized (queue) {
             while (queue.isEmpty()) queue.wait();
-            Runnable task = queue.removeFirst();
+            Baggage task = queue.removeFirst();
             if (task == POISON_PILL) {
                 queue.addLast(task);
                 queue.notifyAll();
             }
+            System.out.println("Baggage processed " + task);
             return task;
         }
     }
 
     @Override
-    public void submit(Runnable task) {
+    public void submit(Baggage task) {
         synchronized (queue) {
             if (queue.peekLast() == POISON_PILL) throw new RejectedExecutionException("shutdown");
             queue.addLast(task);
             queue.notifyAll();
+            System.out.println("Baggage submitted " + task);
         }
     }
 
@@ -57,12 +59,13 @@ public class AirportBaggageImpl implements AirportBaggage {
         public void run() {
             while (true) {
                 try {
-                    Runnable task = take();
+                    Baggage task = take();
                     if (task == POISON_PILL) {
                         System.out.println("Found poison pill");
                         break;
                     }
-                    task.run();
+                    //task.run();
+                    //start();
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
@@ -71,10 +74,12 @@ public class AirportBaggageImpl implements AirportBaggage {
         }
     }
 
+    public record Baggage(int id, String destination) {}
+
     public static void main(String[] args) {
-        AirportBaggage airportBaggage = new AirportBaggageImpl(1);
-        airportBaggage.submit(() -> System.out.println("Task1"));
-        airportBaggage.submit(() -> System.out.println("Task2"));
+        AirportBaggage airportBaggage = new AirportBaggageImpl(2);
+        airportBaggage.submit(new Baggage(1, "USA"));
+        airportBaggage.submit(new Baggage(2, "INDIA"));
         airportBaggage.shutdown();
     }
 
