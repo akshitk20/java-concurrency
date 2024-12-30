@@ -3,6 +3,7 @@ package com.java.masteringthreads.threadpool.counters;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.LongAdder;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.IntStream;
@@ -79,6 +80,19 @@ public class CounterDemo {
         }
     }
 
+    static class LongAdderCounter implements Counter {
+        private final LongAdder longAdder = new LongAdder();
+        @Override
+        public void increment() {
+            longAdder.increment();
+        }
+
+        @Override
+        public long get() {
+            return longAdder.longValue();
+        }
+    }
+
     public static void main(String[] args) {
         for (int i = 0 ; i < 1 ; i++) {
             test(new SynchronizedCounter());
@@ -86,6 +100,7 @@ public class CounterDemo {
             test(new ReentrantLockCounter(true));
             test(new SynchronizedVolatileCounter());
             test(new AtomicCounter());
+            test(new LongAdderCounter());
         }
     }
 
