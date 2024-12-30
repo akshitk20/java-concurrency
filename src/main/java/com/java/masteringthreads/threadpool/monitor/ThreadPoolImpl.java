@@ -106,6 +106,8 @@ public class ThreadPoolImpl implements ThreadPool {
         threadPool.submit(() -> System.out.println("Task3"));
         threadPool.submit(() -> System.out.println("Task4"));
         threadPool.submit(() -> System.out.println("Task5"));
+        threadPool.submit(() -> System.out.println("Task6"));
+        threadPool.submit(() -> System.out.println("Task7"));
         threadPool.shutdown();
     }
 }
