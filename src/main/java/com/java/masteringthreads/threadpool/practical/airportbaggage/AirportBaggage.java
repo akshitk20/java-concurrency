@@ -1,4 +1,4 @@
-package com.java.masteringthreads.threadpool.projects.airportbaggage;
+package com.java.masteringthreads.threadpool.practical.airportbaggage;
 
 public interface AirportBaggage {
     void submit(AirportBaggageImpl.Baggage task);

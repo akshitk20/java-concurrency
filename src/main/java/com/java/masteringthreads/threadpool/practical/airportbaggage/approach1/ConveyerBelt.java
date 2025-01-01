@@ -1,4 +1,4 @@
-package com.java.masteringthreads.threadpool.projects.airportbaggage.approach1;
+package com.java.masteringthreads.threadpool.practical.airportbaggage.approach1;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;

@@ -1,4 +1,4 @@
-package com.java.masteringthreads.threadpool.projects.airportbaggage.approach1;
+package com.java.masteringthreads.threadpool.practical.airportbaggage.approach1;
 
 public class Handler implements Runnable {
     private final ConveyerBelt conveyerBelt;
